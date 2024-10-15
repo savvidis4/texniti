@@ -111,10 +111,6 @@ def find_children(state):
     child_left=move_left(left_state)
     child_right=move_right(right_state)
 
-    
-
-    
-    
     if not child_eat==None:
         children.append(child_eat) 
 
@@ -123,11 +119,6 @@ def find_children(state):
 
     if not child_right==None:
         children.append(child_right) 
-
-    
-    
-    
-    
 
     return children
 
@@ -159,9 +150,15 @@ def expand_front(front, method):
             for child in find_children(node):     
                 front.insert(0,child)
 
-    """
-    #elif method=='BFS':
-    """
+    
+    elif method=='BFS':
+        if front:
+            print("Front:")
+            print(front)
+            node=front.pop(-1)
+            for child in find_children(node):     
+                front.append(child)
+    
     #elif method=='BestFS':
     #else: "other methods to be added"        
     
@@ -285,7 +282,7 @@ def main():
     **** πρέπει να οριστεί η is_goal_state, καθώς δεν είναι μόνο μια η τελική κατάσταση
     """
     counter = 0
-    method='DFS'
+    method='BFS'
     
     """ ----------------------------------------------------------------------------
     **** starting search
