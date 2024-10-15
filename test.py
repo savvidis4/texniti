@@ -194,7 +194,16 @@ def extend_queue(queue, method):
             path.append(child)
             queue_copy.insert(0,path)
     
-    #elif method=='BFS':
+    elif method=='BFS':
+        print("Queue:")
+        print(queue)
+        node=queue.pop(-1)
+        queue_copy=copy.deepcopy(queue)
+        children=find_children(node[-1])
+        for child in children:
+            path=copy.deepcopy(node)
+            path.append(child)
+            queue_copy.append(path)
     #elif method=='BestFS':
     #else: "other methods to be added" 
     
@@ -230,7 +239,7 @@ def find_solution(front, queue, closed, goal, method):
 
     elif front[0]==goal:
         print('This is the solution: ')
-        print(queue[0])
+        print(queue[1])
     
     else:
         closed.append(front[0])
@@ -258,7 +267,7 @@ def main():
     **** πρέπει να οριστεί η is_goal_state, καθώς δεν είναι μόνο μια η τελική κατάσταση
     """
    
-    method='DFS'
+    method='BFS'
     
     """ ----------------------------------------------------------------------------
     **** starting search
