@@ -151,9 +151,14 @@ def expand_front(front, method):
             for child in find_children(node):     
                 front.insert(0,child)
     
-    """
-    #elif method=='BFS':
-    """
+    
+    elif method=='BFS':
+        if front:
+            print("Front:")
+            print(front)
+            node=front.pop(-1)
+            for child in find_children(node):     
+                front.append(child)
     #elif method=='BestFS':
     #else: "other methods to be added"        
     

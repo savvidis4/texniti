@@ -111,11 +111,11 @@ def find_children(state):
     child_left=move_left(left_state)
     child_right=move_right(right_state)
 
-    if not child_eat==None:
-        children.append(child_eat) 
-
     if not child_left==None:
         children.append(child_left)
+
+    if not child_eat==None:
+        children.append(child_eat) 
 
     if not child_right==None:
         children.append(child_right) 
@@ -184,8 +184,8 @@ def make_queue(state):
 
 def extend_queue(queue, method):
     if method=='DFS':
-        # print("Queue:")
-        # print(queue)
+        print("Queue:")
+        print(queue)
         node=queue.pop(0)
         queue_copy=copy.deepcopy(queue)
         children=find_children(node[-1])
@@ -194,7 +194,16 @@ def extend_queue(queue, method):
             path.append(child)
             queue_copy.insert(0,path)
     
-    #elif method=='BFS':
+    elif method=='BFS':
+        print("Queue:")
+        print(queue)
+        node=queue.pop(-1)
+        queue_copy=copy.deepcopy(queue)
+        children=find_children(node[-1])
+        for child in children:
+            path=copy.deepcopy(node)
+            path.append(child)
+            queue_copy.append(path)
     #elif method=='BestFS':
     #else: "other methods to be added" 
     
