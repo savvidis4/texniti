@@ -100,7 +100,7 @@ def is_goal_state(state):
 
 """ Function that finds the children of current state """
 
-def find_children(state):
+def find_children(state,method):
     children=[]
     
     eat_state=copy.deepcopy(state)
@@ -111,15 +111,27 @@ def find_children(state):
     child_left=move_left(left_state)
     child_right=move_right(right_state)
 
-    if not child_left==None:
-        children.append(child_left)
+    if method == 'DFS':
 
-    if not child_eat==None:
-        children.append(child_eat)
+        if not child_left==None:
+            children.append(child_left) 
 
-    if not child_right==None:
-        children.append(child_right)  
+        if not child_right==None:
+            children.append(child_right) 
+        
+        if not child_eat==None:
+            children.append(child_eat)
     
+    elif method == 'BFS':
+
+        if not child_eat==None:
+            children.append(child_eat) 
+
+        if not child_right==None:
+            children.append(child_right) 
+
+        if not child_left==None:
+            children.append(child_left)
 
     return children
 
@@ -143,22 +155,24 @@ def make_front(state):
 """
 
 def expand_front(front, method):  
+    
     if method=='DFS':        
         if front:
             print("Front:")
             print(front)
             node=front.pop(0)
-            for child in find_children(node):     
+            for child in find_children(node,method):     
                 front.insert(0,child)
-    
+
     
     elif method=='BFS':
         if front:
             print("Front:")
             print(front)
-            node=front.pop(-1)
-            for child in find_children(node):     
+            node=front.pop(0)
+            for child in find_children(node,method):     
                 front.append(child)
+    
     #elif method=='BestFS':
     #else: "other methods to be added"        
     
@@ -188,7 +202,7 @@ def extend_queue(queue, method):
         print(queue)
         node=queue.pop(0)
         queue_copy=copy.deepcopy(queue)
-        children=find_children(node[-1])
+        children=find_children(node[-1], method)
         for child in children:
             path=copy.deepcopy(node)
             path.append(child)
@@ -197,9 +211,9 @@ def extend_queue(queue, method):
     elif method=='BFS':
         print("Queue:")
         print(queue)
-        node=queue.pop(-1)
+        node=queue.pop(0)
         queue_copy=copy.deepcopy(queue)
-        children=find_children(node[-1])
+        children=find_children(node[-1], method)
         for child in children:
             path=copy.deepcopy(node)
             path.append(child)
@@ -220,9 +234,8 @@ def extend_queue(queue, method):
 **** Basic recursive function to create search tree (recursive tree expansion)
 **** Βασική αναδρομική συνάρτηση για δημιουργία δέντρου αναζήτησης (αναδρομική επέκταση δέντρου)
 """
-#def find_solution(front, queue, closed, method):
-def find_solution(front, queue, closed, goal, method):
-       
+def find_solutions(front, queue, closed, method,counter,f):
+    counter+=1
     if not front:
         print('No solution')
     
@@ -231,25 +244,55 @@ def find_solution(front, queue, closed, goal, method):
         new_front.pop(0)
         new_queue=copy.deepcopy(queue)
         new_queue.pop(0)
-        find_solution(new_front, new_queue, closed, goal, method)
+        find_solutions(new_front, new_queue, closed, method, counter,f)
     
-    # elif is_goal_state(front[0]):
-    #     print('This is the solution: ')
-    #     print(front[0])
-
-    elif front[0]==goal:
-        print('This is the solution: ')
-        print(queue[1])
+    elif is_goal_state(front[0]):
+        print('This is the solution in',counter,' steps NOGOAL: ')
+        print(queue[0])
     
     else:
         closed.append(front[0])
+        
+        f.write(str(closed) + '\n')
+
         front_copy=copy.deepcopy(front)
         front_children=expand_front(front_copy, method)
         queue_copy=copy.deepcopy(queue)
         queue_children=extend_queue(queue_copy, method)
         closed_copy=copy.deepcopy(closed)
-        find_solution(front_children, queue_children, closed_copy, goal, method)
-	#find_solution(front_children, queue_children, closed_copy, method)
+        find_solutions(front_children, queue_children, closed_copy, method, counter,f)
+
+
+
+# def find_solution(front, queue, closed, goal, method):
+       
+#     if not front:
+#         print('No solution')
+    
+#     elif front[0] in closed:
+#         new_front=copy.deepcopy(front)
+#         new_front.pop(0)
+#         new_queue=copy.deepcopy(queue)
+#         new_queue.pop(0)
+#         find_solution(new_front, new_queue, closed, goal, method)
+    
+#     # elif is_goal_state(front[0]):
+#     #     print('This is the solution: ')
+#     #     print(front[0])
+
+#     elif front[0]==goal:
+#         print('This is the solutionGOAL: ')
+#         print(queue[0])
+    
+#     else:
+#         closed.append(front[0])
+#         front_copy=copy.deepcopy(front)
+#         front_children=expand_front(front_copy, method)
+#         queue_copy=copy.deepcopy(queue)
+#         queue_children=extend_queue(queue_copy, method)
+#         closed_copy=copy.deepcopy(closed)
+#         find_solution(front_children, queue_children, closed_copy, goal, method)
+#         # find_solution(front_children, queue_children, closed_copy, method)
         
         
 """" ----------------------------------------------------------------------------
@@ -259,22 +302,21 @@ def find_solution(front, queue, closed, goal, method):
           
 def main():
     
-    # initial_state=[['','d'],['','f'],['p',''],['',''],['','f'],['','']]   
-    initial_state=[['','d'],['','f'],['p','']]
-    # goal=[['',''],['',''],['',''],['',''],['p',''],['','']]
-    goal=[['',''],['p',''],['','']]
+    initial_state=[['','d'],['','f'],['p','']] 
+    goal=[['',''],['',''],['',''],['',''],['p',''],['','']]
     """ ----------------------------------------------------------------------------
     **** πρέπει να οριστεί η is_goal_state, καθώς δεν είναι μόνο μια η τελική κατάσταση
     """
-   
+    counter = 0
     method='BFS'
     
     """ ----------------------------------------------------------------------------
     **** starting search
     **** έναρξη αναζήτησης
     """
-    find_solution(make_front(initial_state), make_queue(initial_state), [], goal, 'DFS')
-    #find_solution(make_front(initial_state), make_queue(initial_state), [], 'DFS')
+    # find_solution(make_front(initial_state), make_queue(initial_state), [], goal, 'DFS', counter)
+    with open("closed.txt",'w') as f:
+        find_solutions(make_front(initial_state), make_queue(initial_state), [], method, counter,f)
 
         
 
