@@ -12,7 +12,7 @@ import random
 import copy
 
 import sys 
-# sys.setrecursionlimit(10**10) 
+sys.setrecursionlimit(10**6) 
 
 """ Helper functions for checking operator's conditions """
 
