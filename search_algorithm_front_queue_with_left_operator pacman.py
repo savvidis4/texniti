@@ -250,22 +250,24 @@ def make_front(state):
 
 def expand_front(front, method):  
 
-    if method=='DFS':        
-        if front:
-            print("Front:")
-            print(front)
-            node=front.pop(0)
-            for child in find_children(node,method):     
+    # Άμα η front δεν είναι κενή:     
+    if front:
+        print("Front:")
+        print(front)
+
+        # Αφαιρούμε το πρώτο στοιχείο του μετώπου,
+        node=front.pop(0)
+
+        # Βάζουμε στην στοίβα με την σειρά τους τελεστές
+        for child in find_children(node,method):
+            # Αν η μέθοδος είναι η DFS τότε πρέπει οι τελεστές να τοποθετηθούν στην αρχή της ουράς καθώς πρόκειται στην πραγματικότητα για στοίβα
+            if method == 'DFS':
                 front.insert(0,child)
 
-    
-    elif method=='BFS':
-        if front:
-            print("Front:")
-            print(front)
-            node=front.pop(0)
-            for child in find_children(node,method):     
+            # Αν η μέθοδος είναι η ΒFS τότε πρέπει οι τελεστές να τοποθετηθούν στο τέλος της ουράς καθώς πρόκειται στην πραγματικότητα για ουρά
+            elif method == 'BFS':
                 front.append(child)
+       
     
     #elif method=='BestFS':
     #else: "other methods to be added"        
@@ -291,27 +293,54 @@ def make_queue(state):
 """
 
 def extend_queue(queue, method):
-    if method=='DFS':
-        print("Queue:")
-        print(queue)
-        node=queue.pop(0)
-        queue_copy=copy.deepcopy(queue)
-        children=find_children(node[-1],method)
-        for child in children:
-            path=copy.deepcopy(node)
-            path.append(child)
+
+    print("Queue:")
+    print(queue)
+
+    # Διαγράφουμε το πρώτο στοιχείο της ουράς
+    node=queue.pop(0)
+    queue_copy=copy.deepcopy(queue)
+    children=find_children(node[-1],method)
+
+    # Βάζουμε με της σειά τους τελεστές μετάβασης
+    for child in children:
+        path=copy.deepcopy(node)
+        path.append(child)
+
+        # Αν η μέθοδος είναι η DFS τότε πρέπει οι τελεστές να τοποθετηθούν στην αρχή της ουράς καθώς πρόκειται στην πραγματικότητα για στοίβα
+        if method == 'DFS':
             queue_copy.insert(0,path)
-    
-    elif method=='BFS':
-        print("Queue:")
-        print(queue)
-        node=queue.pop(0)
-        queue_copy=copy.deepcopy(queue)
-        children=find_children(node[-1],method)
-        for child in children:
-            path=copy.deepcopy(node)
-            path.append(child)
+
+        # Αν η μέθοδος είναι η ΒFS τότε πρέπει οι τελεστές να τοποθετηθούν στο τέλος της ουράς καθώς πρόκειται στην πραγματικότητα για ουρά
+        elif method == 'BFS':
             queue_copy.append(path)
+
+
+
+# Ama doume pws me thn bestfs prepei na xvristoyn allivw ua xrhshmopoihsoyme ta parakatw
+    # if method=='DFS':
+    #     print("Queue:")
+    #     print(queue)
+    #     node=queue.pop(0)
+    #     queue_copy=copy.deepcopy(queue)
+    #     children=find_children(node[-1],method)
+    #     for child in children:
+    #         path=copy.deepcopy(node)
+    #         path.append(child)
+    #         queue_copy.insert(0,path)
+    
+    # elif method=='BFS':
+    #     print("Queue:")
+    #     print(queue)
+    #     node=queue.pop(0)
+    #     queue_copy=copy.deepcopy(queue)
+    #     children=find_children(node[-1],method)
+    #     for child in children:
+    #         path=copy.deepcopy(node)
+    #         path.append(child)
+            # queue_copy.append(path)
+
+
     #elif method=='BestFS':
     #else: "other methods to be added" 
     
@@ -328,31 +357,52 @@ def extend_queue(queue, method):
 **** Basic recursive function to create search tree (recursive tree expansion)
 **** Βασική αναδρομική συνάρτηση για δημιουργία δέντρου αναζήτησης (αναδρομική επέκταση δέντρου)
 """
-def find_solutions(front, queue, closed, method,counter):
+
+def find_solutions(front, queue, closed, method, counter):
     counter+=1
+
+    # Άμα το μέτωπο είναι κενό και δεν υπάρχει κάποιος κόμβος για εξερεύνηση δεν υπάρχει λύση.
     if not front:
         print('No solution')
     
+    # Άμα το πρώτο στοιχείο του μετώπου (ο τελεστής) υπάρχει στο closed (έχει εξερευνηθεί), 
     elif front[0] in closed:
+
+        # Θα φτιάξουμε νέα αντίγραφα χωρίς τον ήδη εξερευνημένο τελεστή
         new_front=copy.deepcopy(front)
         new_front.pop(0)
         new_queue=copy.deepcopy(queue)
         new_queue.pop(0)
+
+        # Και θα ξανατρέξουμε την εύρεση λύσης αναδρομικά
         find_solutions(new_front, new_queue, closed, method, counter)
     
+    # Άμα ο τελεστής στο μέτωπο είναι τελική κατάσταση,
     elif is_goal_state(front[0]):
+
+        # Εκτυπώνουμε το κλαδί (το πρώτο στοιχείο της ουράς) στο οποίο βρέθηκε η λύση
         print('This is the solution in',counter,' steps: ')
         print(queue[0])
     
+    # Άμα δεν ισχύει τίποτα από τα παραπάνω,
     else:
+
+        # Βάζουμε στο closed τον πλέον εξερευνημένο κόμβο (τελεστή)
         closed.append(front[0])
+
+        # ----------αυτο ειναι δικο μας θα αφαιρεθει------------------
         with open('6cells_closed.txt','w') as f:
             f.write(str(closed) + '\n')
+        # ------------------------------------------------------------
+        
+        # Δημιουργούμε νέα αντίγραφα στα οποία βάζουμε και νέους τελεστές
         front_copy=copy.deepcopy(front)
         front_children=expand_front(front_copy, method)
         queue_copy=copy.deepcopy(queue)
         queue_children=extend_queue(queue_copy, method)
         closed_copy=copy.deepcopy(closed)
+
+        # Ξανατρέχουμε αναδρομικά την συνάρτηση με τα καινούργια δεδομένα
         find_solutions(front_children, queue_children, closed_copy, method, counter)
 
 
@@ -364,11 +414,14 @@ def find_solutions(front, queue, closed, method,counter):
           
 def main():
     
+    # Αρχικοποίηση αρχικής κατάστασης
     initial_state=[['','d'],['','f'],['p',''],['',''],['','f'],['','']]
-    """ ----------------------------------------------------------------------------
-    **** πρέπει να οριστεί η is_goal_state, καθώς δεν είναι μόνο μια η τελική κατάσταση
-    """
+    
+    # ------ δικό μας θα αφαιρεθει---------
     counter = 0
+    # -------------------------------------
+
+    # Να προστεθεί ινπουτ από τον χρήστη για την μέθοδο
     method='DFS'
     
     """ ----------------------------------------------------------------------------
