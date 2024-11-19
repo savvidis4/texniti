@@ -10,9 +10,7 @@
 
 import random
 import copy
-
-import sys 
-sys.setrecursionlimit(10**6) 
+import os
 
 """ Helper functions for checking operator's conditions """
 
@@ -38,7 +36,7 @@ def can_eat(state):
 def can_move_right(state):
 
     # Άμα δεν βρίσκεται το Pacman στο τελευταίο κελί της υπάρχουσας κατάστασης τότε μπορεί.
-    return not state[5][0]=='p'
+    return not state[len(state)-1][0]=='p'
 
 # Έλεγχος για το αν μπορεί το Pacman να κουνηθεί ένα βήμα αριστερά.
 def can_move_left(state):
@@ -79,7 +77,7 @@ def eat(state):
                     state[i][1] = ''
 
                     # Σειριακή αναζήτηση οντοτήτων στην τρέχουσα κατάσταση.
-                    while (k < 6):
+                    while (k < len(state)):
 
                         # Άμα το κελί περιέχει φρούτο (f) ή το Pacman,
                         if (state[k][1] == 'f' or state[k][1] == 'd') or state[k][0] == 'p':
@@ -127,7 +125,6 @@ def move_right(state):
     # Άμα δεν μπορεί να κουνηθεί δεξιά (π.χ. διότι έχει πετύχει "τοίχο") επιστρέφουμε Κενό (None).
     return None
     
-
 # Τελεστής move_left.
 def move_left(state):
 
@@ -152,7 +149,6 @@ def move_left(state):
     # Άμα δεν μπορεί να κουνηθεί δεξιά (π.χ. διότι έχει πετύχει "τοίχο") επιστρέφουμε Κενό (None). 
     return None
 
-
 """ Function that checks if current state is a goal state """
 
 # Έλεγχος άμα η τρέχουσα κατάσταση είναι τελική.
@@ -169,8 +165,6 @@ def is_goal_state(state):
     
     # Άμα δεν βρεθεί φρούτο επιστρέφουμε το Ο.Κ.
     return True
-
-    
 
 """ Function that finds the children of current state """
 
@@ -199,7 +193,7 @@ def find_children(state, method):
     if method == 'DFS':
 
         # Άμα η μέθοδος αναζήτησης είναι η Πρώτα Σε Βάθος (Depth First Search) τότε καταλαβαίνουμε ότι η υλοποίηση της πραγματοποιείται με στοίβα.
-        # Σε αυτήν την περίπτωση θα πρέπει το τελεστής eat να μπεί τελευταίος στην λίστα απογόνων αφού θέλουμε να εκτελεστεί πρώτος (Last In First Out).
+        # Σε αυτήν την περίπτωση θα πρέπει ο τελεστής eat να μπεί τελευταίος στην λίστα απογόνων αφού θέλουμε να εκτελεστεί πρώτος (Last In First Out).
 
         # Τοποθετούμε λοιπόν τους απογόνους στην λίστα.
         if not child_left==None:
@@ -214,7 +208,7 @@ def find_children(state, method):
     elif method == 'BFS':
 
         # Άμα η μέθοδος αναζήτησης είναι η Πρώτα Σε Πλάτος (Breadth First Search) τότε καταλαβαίνουμε ότι η υλοποίηση της πραγματοποιείται με ουρά.
-        # Σε αυτήν την περίπτωση θα πρέπει το τελεστής eat να μπεί πρώτος στην λίστα απογόνων αφού θέλουμε να εκτελεστεί πρώτος (First In First Out).
+        # Σε αυτήν την περίπτωση θα πρέπει ο τελεστής eat να μπεί πρώτος στην λίστα απογόνων αφού θέλουμε να εκτελεστεί πρώτος (First In First Out).
 
         # Τοποθετούμε λοιπόν τους απογόνους στην λίστα.
         if not child_eat==None:
@@ -225,10 +219,89 @@ def find_children(state, method):
 
         if not child_left==None:
             children.append(child_left)
+    
+    elif method == 'HCS':
+
+        # Άμα η μέθοδος αναζήτησης είναι η Αναρρίχηση Λόφων (Hill Climbing Search) τότε καταλαβαίνουμε ότι η υλοποίηση της πραγματοποιείται με στοίβα.
+        # Σε αυτήν την περίπτωση θα πρέπει ο τελεστής eat να μπεί τελευταίος στην λίστα απογόνων αφού θέλουμε να εκτελεστεί πρώτος (Last In First Out).
+
+        #["['o']_['o']"]
+
+        # Στον συγκεκριμένο ευριστικό αλγόριθμο το κριτήριο ταξινόμησης είναι το πλησιέστερο, στο pacman, φρούτο.
+        
+        # Αρχικοποίηση λιστών και του δείκτη του pacman
+        fruit_indexes = []
+        fruit_distances = []
+        abs_fruit_distances = []
+        pacman_index = 0
+
+        # Επαναληπτική αναζήτηση του pacman στην εκάστοτε κατάσταση
+        for i in range(len(state)):
+
+            # Άμα στο κελί βρίσκεται το pacman,
+            if state[i][0] == 'p':
+
+                pacman_index = i
+
+        # Επαναληπτική αναζήτηση των φρούτων στην εκάστοτε κατάσταση
+        for i in range(len(state)):
+
+            # Άμα στο κελί βρίσκεται φρούτο (δεν είναι κενό καθώς δεν διαφοροποιούμε τα φρούτα μεταξύ τους),
+            if state[i][1] != '':
+
+                # Προσθέτουμε στην λίστα δεικτών, τον δείκτη που βρίσκεται το φρούτο
+                fruit_indexes.append(i)
+
+                # Προσθέτουμε στην λίστα αποστάσεων, την διαφορά της θέσης του pacman με αυτήν του φρούτου
+                fruit_distances.append(pacman_index - i)
+        
+        # Για καθεμία από τις αποστάσεις που βρήκαμε,
+        for i in range(len(fruit_distances)):
+
+            # Περνάμε το απόλυτό τους στην λίστα απόλυτων τιμών αποστάσεων
+            abs_fruit_distances.append(abs(fruit_distances[i]))
+            
+        # Αν η λίστα απόλυτων αποστάσεων δεν είναι κενή (υπάρχουν φρούτα στην τρέχουσα κατάσταση),
+        if abs_fruit_distances:
+
+            # Βρίσκουμε την μικρότερη και κρατάμε τον δείκτη της
+            min_index  = abs_fruit_distances.index(min(abs_fruit_distances))
+
+            # Καθώς οι λίστες αποστάσεων είναι παράλληλες, χρησιμοποιούμε τον προαναφερόμενο δείκτη για να βρούμε την πραγματική μικρότερη απόσταση. 
+            # Αφού η κύρια λίστα αποστάσεων μπορεί να περιέχει και αρνητικούς ακεραίους δεν θα μας επιστρέψει την μικρότερη απόσταση ως προς το σημείο 0 (το pacman).
+            
+            # Ο διαχωρισμός μεταξύ των τελεστών μετάβασης (για να ξέρουμε πιο μονοπάτι να αποκλείσουμε) γίνεται από το πρόσημο της τιμής της απόστασης του φρούτου.
+             
+            # Άμα το πρόσημο είναι αρνητικό, τότε το πλησιέστερο στο pacman φρούτο βρίσκεται στα αριστερά. Επομένως προς τα εκεί θα κινηθεί. 
+            if (fruit_distances[min_index] < 0):
+
+                # Τοποθετούμε τον απόγονο στην λίστα.
+                if not child_right==None:
+                    children.append(child_right) 
+
+            # Άμα το πρόσημο είναι θετικό, τότε το πλησιέστερο στο pacman φρούτο βρίσκεται στα δεξιά. Επομένως προς τα εκεί θα κινηθεί. 
+            elif (fruit_distances[min_index] > 0):
+                
+                # Τοποθετούμε τον απόγονο στην λίστα.
+                if not child_left==None:
+                    children.append(child_left)
+
+        # Αν η λίστα απόλυτων αποστάσεων είναι κενή (δεν υπάρχουν φρούτα στην τρέχουσα κατάσταση) και πρόκειται για τελική κατάσταση, 
+        else:
+
+            # Θα πρέπει να φορτώσουμε τους τελευταίους τελεστές μετάβασης (απογόνους) στην λίστα.
+            if not child_right==None:
+                children.append(child_right) 
+
+            if not child_left==None:
+                children.append(child_left)
+        
+        # Καθώς πρόκειται για στοίβα ο τελεστής eat μπαίνει τελευταίος για να υλοποιηθεί πρώτος.
+        if not child_eat==None:
+            children.append(child_eat)
 
     # Επιστρέφουμε την λίστα απογόνων.
     return children
-
 
 """ ----------------------------------------------------------------------------
 **** FRONT
@@ -252,6 +325,7 @@ def expand_front(front, method):
 
     # Άμα η front δεν είναι κενή:     
     if front:
+
         print("Front:")
         print(front)
 
@@ -260,17 +334,18 @@ def expand_front(front, method):
 
         # Βάζουμε στην στοίβα με την σειρά τους τελεστές
         for child in find_children(node,method):
-            # Αν η μέθοδος είναι η DFS τότε πρέπει οι τελεστές να τοποθετηθούν στην αρχή της ουράς καθώς πρόκειται στην πραγματικότητα για στοίβα
+
+            # Αν η μέθοδος είναι η DFS τότε πρέπει οι τελεστές να τοποθετηθούν στην αρχή του μετώπου καθώς πρόκειται στην πραγματικότητα για στοίβα
             if method == 'DFS':
                 front.insert(0,child)
 
-            # Αν η μέθοδος είναι η ΒFS τότε πρέπει οι τελεστές να τοποθετηθούν στο τέλος της ουράς καθώς πρόκειται στην πραγματικότητα για ουρά
+            # Αν η μέθοδος είναι η ΒFS τότε πρέπει οι τελεστές να τοποθετηθούν στο τέλος του μετώπου καθώς πρόκειται στην πραγματικότητα για ουρά
             elif method == 'BFS':
                 front.append(child)
-       
-    
-    #elif method=='BestFS':
-    #else: "other methods to be added"        
+            
+            # Αν η μέθοδος είναι η HCS τότε πρέπει οι τελεστές να τοποθετηθούν στην αρχή του μετώπου καθώς πρόκειται στην πραγματικότητα για στοίβα
+            elif method == 'HCS':
+                front.insert(0,child)     
     
     return front
 
@@ -314,36 +389,11 @@ def extend_queue(queue, method):
         # Αν η μέθοδος είναι η ΒFS τότε πρέπει οι τελεστές να τοποθετηθούν στο τέλος της ουράς καθώς πρόκειται στην πραγματικότητα για ουρά
         elif method == 'BFS':
             queue_copy.append(path)
+        
+        # Αν η μέθοδος είναι η HCS τότε πρέπει οι τελεστές να τοποθετηθούν στην αρχή της ουράς καθώς πρόκειται στην πραγματικότητα για στοίβα
+        elif method == 'HCS':
+            queue_copy.insert(0,path)
 
-
-
-# Ama doume pws me thn bestfs prepei na xvristoyn allivw ua xrhshmopoihsoyme ta parakatw
-    # if method=='DFS':
-    #     print("Queue:")
-    #     print(queue)
-    #     node=queue.pop(0)
-    #     queue_copy=copy.deepcopy(queue)
-    #     children=find_children(node[-1],method)
-    #     for child in children:
-    #         path=copy.deepcopy(node)
-    #         path.append(child)
-    #         queue_copy.insert(0,path)
-    
-    # elif method=='BFS':
-    #     print("Queue:")
-    #     print(queue)
-    #     node=queue.pop(0)
-    #     queue_copy=copy.deepcopy(queue)
-    #     children=find_children(node[-1],method)
-    #     for child in children:
-    #         path=copy.deepcopy(node)
-    #         path.append(child)
-            # queue_copy.append(path)
-
-
-    #elif method=='BestFS':
-    #else: "other methods to be added" 
-    
     return queue_copy
             
 """ ----------------------------------------------------------------------------
@@ -353,13 +403,124 @@ def extend_queue(queue, method):
   #### to be  added ####
 """
 
+def walle():
+
+    # Ένα γλυκούλικο ρομπότ καλωσορίσματος
+    print('\n')
+    print("======GREETINGS TRAVELER======")
+    print('  __      _____ ____')
+    print(' /---__  ( (O)|/(O) )')
+    print('\\ \\ \\ \\/  \\___U\\___/')
+    print('    L\\       ||')
+    print('     \\\\ ____|||_____')
+    print('      \\\\|==|[]__/=|\\--|')
+    print('       \\|* ||||\\==|/--|')
+    print('    ____| *|[][-- |__')
+    print('   ||EEE|__EEEE_[ ]_|EE\\')
+    print('   ||EEE|=O      O|=|EEE|')
+    print('   \\ LEEE|         \\|EEE|_))')
+    print('                          ```')
+    print('\n')
+
+def input_method():
+
+    walle()
+
+    # Έλεγχος εγγυρότητας για την επιλογή του χρήστη.
+    while True:
+
+        method= input("Which method would you like to implement?\n1) Depth First Search (DFS)\n2) Breadth First Search (BFS)\n3) Hill Climb Search (HCS)\nYour choice (1, 2, 3): ")
+
+        print('\n')
+
+        if method == "1" or method == "2" or method == "3":
+
+            if method == "1":
+                method = "DFS"
+            elif method == "2":
+                method = "BFS"
+            elif method == "3":
+                method = "HCS"
+            
+            break
+    
+    return method
+
+def initial_state_creation():
+    
+    os.system('cls')
+    choice = int("0")
+
+    while int(choice) != 1 and int(choice) != 2:
+
+        choice = input("Would you like a custom initial state or the predefined from the AI Lab one? (1,2): ")
+    
+    if int(choice) == 2:
+
+        initial_state=[['','d'],['','f'],['p',''],['',''],['','f'],['','']]
+        return initial_state
+
+    else:
+
+        cell_number = 0
+
+        while int(cell_number) < 3:
+            cell_number = input("State the number of cells you would like the world to be created into (>=3): ")
+
+        fruits = int(cell_number) // 3
+        devil_fruit = 1
+        pacman = 1
+
+        state = []
+        indexes = []
+
+        for i in range (0,int(cell_number)):
+            state.append(['',''])
+
+        for i in range (0, fruits + devil_fruit + pacman):
+
+            index = random.randint(0,int(cell_number)-1)
+
+            while index in indexes:
+                
+                index = random.randint(0,int(cell_number)-1)
+            
+            indexes.append(index)
+
+        for i in range (0, devil_fruit):
+
+            findex = random.choice(indexes)
+
+            state[findex][1] = 'd'
+
+            indexes.remove(findex)
+            
+        for i in range (0, fruits):
+
+            findex = random.choice(indexes)
+
+            state[findex][1] = 'f'
+
+            indexes.remove(findex)
+
+        for i in range (0, pacman):
+
+            findex = random.choice(indexes)
+
+            state[findex][0] = 'p'
+
+            indexes.remove(findex)
+
+        print('The state created: ', state)
+        
+        return state
+
 """ ----------------------------------------------------------------------------
 **** Basic recursive function to create search tree (recursive tree expansion)
 **** Βασική αναδρομική συνάρτηση για δημιουργία δέντρου αναζήτησης (αναδρομική επέκταση δέντρου)
 """
 
-def find_solutions(front, queue, closed, method, counter):
-    counter+=1
+def find_solutions(front, queue, closed, method):
 
     # Άμα το μέτωπο είναι κενό και δεν υπάρχει κάποιος κόμβος για εξερεύνηση δεν υπάρχει λύση.
     if not front:
@@ -375,13 +536,13 @@ def find_solutions(front, queue, closed, method, counter):
         new_queue.pop(0)
 
         # Και θα ξανατρέξουμε την εύρεση λύσης αναδρομικά
-        find_solutions(new_front, new_queue, closed, method, counter)
+        find_solutions(new_front, new_queue, closed, method)
     
     # Άμα ο τελεστής στο μέτωπο είναι τελική κατάσταση,
     elif is_goal_state(front[0]):
 
         # Εκτυπώνουμε το κλαδί (το πρώτο στοιχείο της ουράς) στο οποίο βρέθηκε η λύση
-        print('This is the solution in',counter,' steps: ')
+        print('This is the solution: ')
         print(queue[0])
     
     # Άμα δεν ισχύει τίποτα από τα παραπάνω,
@@ -389,11 +550,6 @@ def find_solutions(front, queue, closed, method, counter):
 
         # Βάζουμε στο closed τον πλέον εξερευνημένο κόμβο (τελεστή)
         closed.append(front[0])
-
-        # ----------αυτο ειναι δικο μας θα αφαιρεθει------------------
-        with open('6cells_closed.txt','w') as f:
-            f.write(str(closed) + '\n')
-        # ------------------------------------------------------------
         
         # Δημιουργούμε νέα αντίγραφα στα οποία βάζουμε και νέους τελεστές
         front_copy=copy.deepcopy(front)
@@ -403,9 +559,7 @@ def find_solutions(front, queue, closed, method, counter):
         closed_copy=copy.deepcopy(closed)
 
         # Ξανατρέχουμε αναδρομικά την συνάρτηση με τα καινούργια δεδομένα
-        find_solutions(front_children, queue_children, closed_copy, method, counter)
-
-
+        find_solutions(front_children, queue_children, closed_copy, method)
 
 """" ----------------------------------------------------------------------------
 ** Executing the code
@@ -415,20 +569,18 @@ def find_solutions(front, queue, closed, method, counter):
 def main():
     
     # Αρχικοποίηση αρχικής κατάστασης
-    initial_state=[['','d'],['','f'],['p',''],['',''],['','f'],['','']]
-    
-    # ------ δικό μας θα αφαιρεθει---------
-    counter = 0
-    # -------------------------------------
+    # initial_state=[['','d'],['','f'],['p',''],['',''],['','f'],['','']]
 
-    # Να προστεθεί ινπουτ από τον χρήστη για την μέθοδο
-    method='DFS'
+    initial_state = initial_state_creation()
+
+    method = input_method()
     
     """ ----------------------------------------------------------------------------
     **** starting search
     **** έναρξη αναζήτησης
     """
-    find_solutions(make_front(initial_state), make_queue(initial_state), [], method, counter)
+
+    find_solutions(make_front(initial_state), make_queue(initial_state), [], method)
 
         
 if __name__ == "__main__":
