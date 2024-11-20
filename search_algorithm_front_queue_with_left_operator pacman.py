@@ -90,7 +90,7 @@ def eat(state):
                     while (random_index in fruits_list):
 
                         # Αναπαραγωγή τυχαίου αριθμού από το 0 έως το 5 που θα συμβολίζει την θέση ενός κελιού της κατάστασης.
-                        random_index = random.randint(0,5)
+                        random_index = random.randint(0,len(state)-1)
 
                     # Αφού ο τυχαίος "δείκτης" δεν αντιστοιχεί σε κελί με οντότητα, βάλε στο κελί που δείχνει ένα νέο φρούτο.
                     state[random_index][1] = 'f'
@@ -448,7 +448,7 @@ def input_method():
 
 def initial_state_creation():
     
-    os.system('cls')
+    os.system('clear')
     choice = int("0")
 
     while int(choice) != 1 and int(choice) != 2:
