@@ -11,6 +11,7 @@
 import random
 import copy
 import os
+from sys import platform
 
 """ Helper functions for checking operator's conditions """
 
@@ -429,7 +430,7 @@ def input_method():
     # Έλεγχος εγγυρότητας για την επιλογή του χρήστη.
     while True:
 
-        method= input("Which method would you like to implement?\n1) Depth First Search (DFS)\n2) Breadth First Search (BFS)\n3) Hill Climb Search (HCS)\nYour choice (1, 2, 3): ")
+        method = input("Which method would you like to implement?\n1) Depth First Search (DFS)\n2) Breadth First Search (BFS)\n3) Hill Climb Search (HCS)\nYour choice (1, 2, 3): ")
 
         print('\n')
 
@@ -448,71 +449,106 @@ def input_method():
 
 def initial_state_creation():
     
-    os.system('clear')
-    choice = int("0")
+    # 'Ελεγχος του λειτουργικού συστήματος (Windows/Unix)
+    if platform == 'win32':
 
+        # Εντολή στο τερματικό για καθαρισμό της οθόνης στα Windows.
+        os.system('cls')
+    else:
+
+        # Εντολή στο τερματικό για καθαρισμό της οθόνης στα Unix.
+        os.system('clear')
+
+    choice = 0
+
+    # Έλεγχος εγγυρότητας για την επιλογή του χρήστη.
     while int(choice) != 1 and int(choice) != 2:
 
-        choice = input("Would you like a custom initial state or the predefined from the AI Lab one? (1,2): ")
+        choice = input("Would you like a custom initial state or the one predefined from the AI Lab? (1,2): ")
     
+    print('\n')
+
     if int(choice) == 2:
 
+        # Αρχικοποίηση αρχικής κατάστασης.
         initial_state=[['','d'],['','f'],['p',''],['',''],['','f'],['','']]
+
+        print('The state initialized: ', initial_state)
+
         return initial_state
 
     else:
 
         cell_number = 0
 
+        # Έλεγχος εγγυρότητας για την επιλογή του χρήστη.
         while int(cell_number) < 3:
+
             cell_number = input("State the number of cells you would like the world to be created into (>=3): ")
 
+        # Ο αριθμός των φρούτων υπολογίζεται από την σχέση: Μέγεθος κόσμου DIV 3. Δηλαδή την ακέραια διαίρεση.
         fruits = int(cell_number) // 3
+
+        # Ο αριθμός των κακών φρούτων.
         devil_fruit = 1
+
+        # Ο αριθμός των pacman.
         pacman = 1
 
+        # Αρχικοποίηση λιστών
         state = []
         indexes = []
 
+        # Γέμισμα λίστας κόσμου με όσα κελιά ζήτησε ο χρήστης.
         for i in range (0,int(cell_number)):
+
             state.append(['',''])
 
+        # Αναπαραγωγή τυχαίων μοναδικών θέσεων για κάθε αντικείμενο και αποθήκευσή τους στην λίστα δεικτών
         for i in range (0, fruits + devil_fruit + pacman):
 
             index = random.randint(0,int(cell_number)-1)
 
+            # Έλεγχος για το αν η τυχαία θέση είναι κατειλημμένη
             while index in indexes:
                 
                 index = random.randint(0,int(cell_number)-1)
             
             indexes.append(index)
 
+        # Γέμισμα του κόσμου με όσα κακά φρούτα έχουν οριστεί σε τυχαία επιλεγμένα τυχαίες θέσεις.
         for i in range (0, devil_fruit):
 
             findex = random.choice(indexes)
 
             state[findex][1] = 'd'
 
+            # Αφαίρεση της θέσης από την λίστα τυχαίων θέσεων.
             indexes.remove(findex)
-            
+        
+        # Γέμισμα του κόσμου με όσα καλά φρούτα έχουν οριστεί σε τυχαία επιλεγμένα τυχαίες θέσεις.
         for i in range (0, fruits):
 
             findex = random.choice(indexes)
 
             state[findex][1] = 'f'
 
+            # Αφαίρεση της θέσης από την λίστα τυχαίων θέσεων.
             indexes.remove(findex)
 
+        # Γέμισμα του κόσμου με όσα pacman έχουν οριστεί σε τυχαία επιλεγμένα τυχαίες θέσεις.
         for i in range (0, pacman):
 
             findex = random.choice(indexes)
 
             state[findex][0] = 'p'
 
+            # Αφαίρεση της θέσης από την λίστα τυχαίων θέσεων.
             indexes.remove(findex)
 
-        print('The state created: ', state)
+        print('\nThe state initialized: ', state)
         
+        # Επιστροφή δημιουργημένης αρχικής κατάστασης. 
         return state
 
 """ ----------------------------------------------------------------------------
@@ -568,11 +604,10 @@ def find_solutions(front, queue, closed, method):
           
 def main():
     
-    # Αρχικοποίηση αρχικής κατάστασης
-    # initial_state=[['','d'],['','f'],['p',''],['',''],['','f'],['','']]
-
+    # Κάλεσμα συνάρτησης δημιουργίας αρχικών καταστάσεων
     initial_state = initial_state_creation()
 
+    # Κάλεσμα συνάρτησης επιλογής μεθόδου εύρεσης λύσης
     method = input_method()
     
     """ ----------------------------------------------------------------------------
