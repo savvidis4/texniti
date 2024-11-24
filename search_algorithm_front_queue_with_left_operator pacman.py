@@ -342,7 +342,7 @@ def expand_front(front, method):
 
             # Αν η μέθοδος είναι η ΒFS τότε πρέπει οι τελεστές να τοποθετηθούν στο τέλος του μετώπου καθώς πρόκειται στην πραγματικότητα για ουρά
             elif method == 'BFS':
-                front.append(child)
+                front.insert(-1,child)
             
             # Αν η μέθοδος είναι η HCS τότε πρέπει οι τελεστές να τοποθετηθούν στην αρχή του μετώπου καθώς πρόκειται στην πραγματικότητα για στοίβα
             elif method == 'HCS':
@@ -464,9 +464,7 @@ def initial_state_creation():
     # Έλεγχος εγγυρότητας για την επιλογή του χρήστη.
     while int(choice) != 1 and int(choice) != 2:
 
-        choice = input("Would you like a custom initial state or the one predefined from the AI Lab? (1,2): ")
-    
-    print('\n')
+        choice = input("Would you like a random initial state or the one predefined from the AI Lab? (1,2): ")
 
     if int(choice) == 2:
 
@@ -479,15 +477,11 @@ def initial_state_creation():
 
     else:
 
-        cell_number = 0
+        # Ο αριθμός των καλών φρούτων.
+        cell_number = 6
 
-        # Έλεγχος εγγυρότητας για την επιλογή του χρήστη.
-        while int(cell_number) < 3:
-
-            cell_number = input("State the number of cells you would like the world to be created into (>=3): ")
-
-        # Ο αριθμός των φρούτων υπολογίζεται από την σχέση: Μέγεθος κόσμου DIV 3. Δηλαδή την ακέραια διαίρεση.
-        fruits = int(cell_number) // 3
+        # Ο αριθμός των καλών φρούτων.
+        fruits = 2
 
         # Ο αριθμός των κακών φρούτων.
         devil_fruit = 1
@@ -496,13 +490,8 @@ def initial_state_creation():
         pacman = 1
 
         # Αρχικοποίηση λιστών
-        state = []
+        state = [['', ''], ['', ''], ['', ''], ['', ''], ['', ''], ['', '']]
         indexes = []
-
-        # Γέμισμα λίστας κόσμου με όσα κελιά ζήτησε ο χρήστης.
-        for i in range (0,int(cell_number)):
-
-            state.append(['',''])
 
         # Αναπαραγωγή τυχαίων μοναδικών θέσεων για κάθε αντικείμενο και αποθήκευσή τους στην λίστα δεικτών
         for i in range (0, fruits + devil_fruit + pacman):
@@ -578,8 +567,28 @@ def find_solutions(front, queue, closed, method):
     elif is_goal_state(front[0]):
 
         # Εκτυπώνουμε το κλαδί (το πρώτο στοιχείο της ουράς) στο οποίο βρέθηκε η λύση
-        print('This is the solution: ')
-        print(queue[0])
+        print('\n')
+        print('This is the solution: \n')
+
+        if is_goal_state(queue[0][-1]):
+
+            has_goal_state = True
+        
+        else:
+
+            has_goal_state = False
+
+        for i in queue[0]:
+
+            print(i, '\n')
+
+            if is_goal_state(i):
+                break
+        
+        if has_goal_state == False:
+
+            print(front[0],'\n')
+        
     
     # Άμα δεν ισχύει τίποτα από τα παραπάνω,
     else:
