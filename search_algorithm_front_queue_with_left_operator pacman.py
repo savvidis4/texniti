@@ -215,11 +215,11 @@ def find_children(state, method):
         if not child_eat==None:
             children.append(child_eat) 
 
-        if not child_right==None:
-            children.append(child_right) 
-
         if not child_left==None:
             children.append(child_left)
+
+        if not child_right==None:
+            children.append(child_right) 
     
     elif method == 'HCS':
 
@@ -328,7 +328,9 @@ def expand_front(front, method):
     if front:
 
         print("Front:")
-        print(front)
+        
+        for i in front:
+            print(i)
 
         # Αφαιρούμε το πρώτο στοιχείο του μετώπου,
         node=front.pop(0)
@@ -342,7 +344,7 @@ def expand_front(front, method):
 
             # Αν η μέθοδος είναι η ΒFS τότε πρέπει οι τελεστές να τοποθετηθούν στο τέλος του μετώπου καθώς πρόκειται στην πραγματικότητα για ουρά
             elif method == 'BFS':
-                front.insert(-1,child)
+                front.append(child)
             
             # Αν η μέθοδος είναι η HCS τότε πρέπει οι τελεστές να τοποθετηθούν στην αρχή του μετώπου καθώς πρόκειται στην πραγματικότητα για στοίβα
             elif method == 'HCS':
@@ -371,7 +373,9 @@ def make_queue(state):
 def extend_queue(queue, method):
 
     print("Queue:")
-    print(queue)
+
+    for i in queue:
+        print(i)
 
     # Διαγράφουμε το πρώτο στοιχείο της ουράς
     node=queue.pop(0)
@@ -551,6 +555,17 @@ def find_solutions(front, queue, closed, method):
     if not front:
         print('No solution')
     
+    # Άμα ο τελεστής στο μέτωπο είναι τελική κατάσταση,
+    elif is_goal_state(front[0]):
+
+        # Εκτυπώνουμε το κλαδί (το πρώτο στοιχείο της ουράς) στο οποίο βρέθηκε η λύση
+        print('\n')
+        print('This is the solution: \n')
+
+        for i in queue[0]:
+
+            print(i, '\n') 
+    
     # Άμα το πρώτο στοιχείο του μετώπου (ο τελεστής) υπάρχει στο closed (έχει εξερευνηθεί), 
     elif front[0] in closed:
 
@@ -561,34 +576,7 @@ def find_solutions(front, queue, closed, method):
         new_queue.pop(0)
 
         # Και θα ξανατρέξουμε την εύρεση λύσης αναδρομικά
-        find_solutions(new_front, new_queue, closed, method)
-    
-    # Άμα ο τελεστής στο μέτωπο είναι τελική κατάσταση,
-    elif is_goal_state(front[0]):
-
-        # Εκτυπώνουμε το κλαδί (το πρώτο στοιχείο της ουράς) στο οποίο βρέθηκε η λύση
-        print('\n')
-        print('This is the solution: \n')
-
-        if is_goal_state(queue[0][-1]):
-
-            has_goal_state = True
-        
-        else:
-
-            has_goal_state = False
-
-        for i in queue[0]:
-
-            print(i, '\n')
-
-            if is_goal_state(i):
-                break
-        
-        if has_goal_state == False:
-
-            print(front[0],'\n')
-        
+        find_solutions(new_front, new_queue, closed, method)       
     
     # Άμα δεν ισχύει τίποτα από τα παραπάνω,
     else:
